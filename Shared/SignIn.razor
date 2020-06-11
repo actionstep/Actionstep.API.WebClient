@@ -1,0 +1,25 @@
+﻿@page "/signin"
+
+<div>
+    @if (_appState.IsSignedIn)
+    {
+        <div class="top-row">
+            <div class="col-md-auto">
+                Hi <strong>@_appState.Firstname</strong>
+            </div>
+            <div class="col-md-auto">
+                |
+            </div>
+            <div class="col-md-auto">
+                Your orgkey is: <strong>@_appState.Orgkey</strong>
+            </div>
+            <div class="col-md-auto">
+                <button type="button" class="form-control btn btn-primary btn-sm" @onclick="@(() => SignOutUser())">Sign Out</button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <button type="button" class="form-control btn btn-primary btn-sm" @onclick="@(() => SignInUser())">Sign In</button>
+    }
+</div>

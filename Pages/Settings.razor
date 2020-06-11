@@ -1,0 +1,125 @@
+﻿@page "/settings"
+
+@using Actionstep.API.WebClient.Validators;
+
+<div class="container-fluid">
+    <div class="row pt-md-5 pb-md-5">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <h3><strong>Application Settings</strong></h3>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+
+    <EditForm OnValidSubmit="@UpdateSettings" EditContext="@settingsEditContext">
+        <FluentValidationValidator />
+
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="clientid">Client ID</label>
+                    <InputText @bind-Value="Model.ClientId" id="clientid" class="form-control" FullWidth="true" />
+                    <small class="form-text text-muted">
+                        <ValidationMessage For="@(() => Model.ClientId)" />
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="clientsecret">Client Secret</label>
+                    <InputText @bind-Value="Model.ClientSecret" id="clientsecret" class="form-control" FullWidth="true" />
+                    <small class="form-text text-muted">
+                        <ValidationMessage For="@(() => Model.ClientSecret)" />
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="scopes">Scopes (space separated)</label>
+                    <InputText @bind-Value="Model.Scopes" id="scopes" class="form-control" FullWidth="true" />
+                    <small class="form-text text-muted">
+                        <ValidationMessage For="@(() => Model.Scopes)" />
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="authorizeurl">Authorize Url</label>
+                    <InputText @bind-Value="Model.AuthorizeUrl" id="authorizeurl" class="form-control" FullWidth="true" />
+                    <small class="form-text text-muted">
+                        <ValidationMessage For="@(() => Model.AuthorizeUrl)" />
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="accesstokenurl">Access Token Url</label>
+                    <InputText @bind-Value="Model.AccessTokenUrl" id="accesstokenurl" class="form-control" FullWidth="true" />
+                    <small class="form-text text-muted">
+                        <ValidationMessage For="@(() => Model.AccessTokenUrl)" />
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="redirecturl">Redirect Url</label>
+                    <InputText @bind-Value="Model.RedirectUrl" id="redirecturl" class="form-control" FullWidth="true" />
+                    <small class="form-text text-muted">
+                        <ValidationMessage For="@(() => Model.RedirectUrl)" />
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+
+        <div class="row pt-md-5">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @if (Debounce)
+                    {
+                        <button type="submit" class="btn btn-primary" disabled>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Saving...
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    }
+                    <button type="button" class="btn btn-primary" @onclick="@(() => CancelChanges())">Cancel</button>
+                    <div class="float-right">
+                        <button type="button" class="btn btn-primary" @onclick="@(() => ClearSettings())">Clear</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </EditForm>
+</div>

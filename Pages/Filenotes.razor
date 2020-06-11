@@ -1,0 +1,200 @@
+﻿@page "/filenotes"
+
+@using Actionstep.API.WebClient.Paging;
+@using Actionstep.API.WebClient.UI_Components;
+@using Actionstep.API.WebClient.Validators;
+
+<div class="container-fluid">
+    <div class="row pt-md-5 pb-md-5">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="d-flex">
+                <div class="mr-auto">
+                    <h2><strong>Matter File Notes</strong></h2>
+                </div>
+                <button type="button" class="form-control-sm btn btn-primary btn-sm" @onclick="@(() => AddNewFilenote())">Add +</button>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+
+    @if (ViewModel.ShowNewFilenoteCard)
+    {
+        <div class="row pb-md-5">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <div class="card">
+                    @if (ViewModel.AddEditViewModel.FilenoteId == 0)
+                    {
+                        <h5 class="card-header">Create a file note</h5>
+                    }
+                    else
+                    {
+                        <h5 class="card-header">Modify existing file note</h5>
+                    }
+                    <div class="card-body">
+                        <EditForm OnValidSubmit="@SaveFilenote" EditContext="@filenoteEditContext">
+                            <FluentValidationValidator />
+
+                            <div class="container-fluid">
+                                <div class="row">
+                                    @if (ViewModel.AddEditViewModel.FilenoteId == 0)
+                                    {
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="matterSelector">Select Matter</label>
+                                                <InputSelect id="matterSelector" @bind-Value="ViewModel.AddEditViewModel.ActionId" class="form-control form-control-sm" Required="true" FullWidth="true">
+                                                    <option value="-1">Choose...</option>
+                                                    @foreach (var matter in ViewModel.MatterLookupList)
+                                                    {
+                                                        if (matter.MatterId.ToString() == ViewModel.AddEditViewModel.ActionId)
+                                                        {
+                                                            <option value="@matter.MatterId" selected>@matter.Name</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@matter.MatterId">@matter.Name</option>
+                                                        }
+                                                    }
+                                                </InputSelect>
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.AddEditViewModel.ActionId)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div class="col-md-@ViewModel.AddEditViewModel.ColumnSize">
+                                        <div class="form-group">
+                                            <label for="content">Content</label>
+                                            <InputText @bind-Value="ViewModel.AddEditViewModel.Content" id="content" class="form-control form-control-sm" Required="true" FullWidth="true" />
+                                            <small class="form-text text-muted">
+                                                <ValidationMessage For="@(() => ViewModel.AddEditViewModel.Content)" />
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row pt-md-2">
+                                    <div class="col-md-12">
+                                        <div class="d-flex flex-row-reverse">
+                                            <div class="form-group">
+                                                @if (ViewModel.Debounce)
+                                                {
+                                                    <button type="submit" class="btn btn-primary btn-sm" disabled>
+                                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                        Saving...
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                                }
+                                                <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => CancelNewFilenote())">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+    }
+
+    <div class="row pb-md-3">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="d-flex">
+                @if (ViewModel.EnableMultipleDelete)
+                {
+                    <nav class="navbar navbar-expand-lg ml-n3">
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="@(() => DeleteFilenotes())">Delete Selected</button>
+                    </nav>
+                }
+                <nav class="navbar navbar-expand-lg ml-n3">
+                    <PageNavigator PageNumber="@ViewModel.FilenotePagedData.PageNumber" PageSize="@ViewModel.FilenotePagedData.PageSize"
+                                   TotalPageCount="@ViewModel.FilenotePagedData.TotalPageCount" PageNumberChanged="@PageNumberChanged"
+                                   TotalRecordCount="@ViewModel.FilenotePagedData.TotalRowCount" PageSizeChanged="@PageSizeChanged" />
+                    @if (ViewModel.Loading)
+                    {
+                        <div class="pl-md-2">
+                            <small>Loading...</small>
+                            <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                        </div>
+                    }
+                </nav>
+                <div class="row ml-auto">
+                    <nav class="navbar navbar-expand-lg">
+                        <MatterSelector SelectedMatterChanged="@SelectedMatterFilterChanged" />
+                    </nav>
+                    <nav class="navbar navbar-expand-lg">
+                        <FreeTextSearch SearchTextChanged="@SearchFilenotes" />
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+
+    <EditForm OnValidSubmit="@DeleteFilenotes" EditContext="@multiDeleteEditContext">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <div class="overflow-auto" style="max-height: 750px">
+                    <div class="table-responsive-sm">
+                        <table class="table table-sm table-striped table-hover" style="table-layout:auto">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th></th>
+                                    <th class="small">Id</th>
+                                    <th class="small">Content</th>
+                                    <th class="small">Associated with Matter</th>
+                                    <th class="small">Created</th>
+                                    <th class="small">Created By</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var filenote in ViewModel.FilenotePagedData.DataCollection)
+                                {
+                                    <tr>
+                                        <td class="align-middle" style="width: 4%">
+                                            <div class="custom-control custom-checkbox ml-2">
+                                                <input type="checkbox" class="custom-control custom-checkbox custom-control-input" id="@filenote.FilenoteId"
+                                                       checked="@filenote.Selected" @onchange="@((e) => CanMultipleDelete(filenote.FilenoteId, e))" />
+                                                <label class="custom-control-label" for="@filenote.FilenoteId"></label>
+                                            </div>
+                                        </td>
+                                        <td class="align-middle small" style="width: 3%">@filenote.FilenoteId</td>
+                                        <td class="align-middle small" style="width: 48%">
+                                            @if (filenote.Content.Length > 110)
+                                            {
+                                                @filenote.Content.Substring(0, 110).Insert(110, "...")
+                                            }
+                                            else
+                                            {
+                                                @filenote.Content
+                                            }
+                                        </td>
+
+                                        <td class="align-middle text-nowrap small" style="width: 15%">@filenote.MatterName</td>
+                                        <td class="align-middle text-nowrap small" style="width: 12%">@filenote.Created.ToString("ddd dd-MMM-yyyy HH:mm")</td>
+                                        <td class="align-middle text-nowrap small" style="width: 8%">@filenote.CreatedBy</td>
+                                        <td class="align-middle" style="width: 10%">
+                                            <div class="float-right">
+                                                <button type="button" class="ml-3 form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditFilenote(@filenote.FilenoteId))">Edit</button>
+                                                <button type="button" class="form-control-sm btn btn-danger btn-sm" @onclick="@(() => DeleteFilenote(@filenote.FilenoteId))">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </EditForm>
+</div>

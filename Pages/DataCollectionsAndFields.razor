@@ -1,0 +1,399 @@
+﻿@page "/datacollectionsandfields"
+
+@using Actionstep.API.WebClient.Paging;
+@using Actionstep.API.WebClient.UI_Components;
+@using Actionstep.API.WebClient.Validators;
+
+<div class="container-fluid">
+    <div class="row pt-md-5 pb-md-5">
+        <div class="col-md-auto"></div>
+        <h2><strong>Data Collections and Fields</strong></h2>
+    </div>
+
+    @if (!String.IsNullOrEmpty(ViewModel.ModalContent))
+    {
+        <div class="modal fade show" id="exampleModalCenter" style="display:block" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-light text-danger">
+                        <div class="row">
+                            <div class="col-md-auto">
+                                <span class="oi oi-warning" aria-hidden="true" />
+                            </div>
+                            <div>
+                                <h6 class="modal-title"><strong>@ViewModel.ModalTitle</strong></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        @ViewModel.ModalContent
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-primary" @onclick="@CancelModalDialog" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row pb-md-3">
+        <div class="col-md-6">
+            <div class="d-flex">
+                <div class="ml-md-3 pb-md-3">
+                    <h4><strong>Data Collections</strong></h4>
+                </div>
+                <div class="ml-md-auto pr-md-3">
+                    <button type="button" class="form-control-sm btn btn-primary btn-sm" @onclick="@(() => AddCustomDataCollection())">Add +</button>
+                </div>
+            </div>
+
+            @if (ViewModel.ShowCreateDataCollectionCard)
+            {
+                <div class="pl-md-3 pr-md-3 pb-md-3">
+                    <div class="card">
+                        @if (ViewModel.DataCollectionAddEditViewModel.DataCollectionId == 0)
+                        {
+                            <h5 class="card-header">Create a data collection</h5>
+                        }
+                        else
+                        {
+                            <h5 class="card-header">Modify existing data collection</h5>
+                        }
+                        <div class="card-body">
+                            <EditForm OnValidSubmit="@SaveDataCollection" EditContext="@dataCollectionEditContext">
+                                <FluentValidationValidator />
+
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="dataCollectionName">Name</label>
+                                                <InputText @bind-Value="ViewModel.DataCollectionAddEditViewModel.Name" id="dataCollectionName" class="form-control form-control-sm" FullWidth="true" />
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.DataCollectionAddEditViewModel.Name)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="dataCollectionLabel">Label</label>
+                                                <InputText @bind-Value="ViewModel.DataCollectionAddEditViewModel.Label" id="dataCollectionLabel" class="form-control form-control-sm" FullWidth="true" />
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.DataCollectionAddEditViewModel.Label)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="dataCollectionDescription">Description</label>
+                                                <InputText @bind-Value="ViewModel.DataCollectionAddEditViewModel.Description" id="dataCollectionDescription" class="form-control form-control-sm" FullWidth="true" />
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.DataCollectionAddEditViewModel.Description)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="matterTypeSelector">Matter Type</label>
+                                                <InputSelect id="matterSelector" @bind-Value="ViewModel.DataCollectionAddEditViewModel.MatterTypeId" class="form-control form-control-sm" Required="true" FullWidth="true">
+                                                    <option value="-1">Choose...</option>
+                                                    @foreach (var matterType in ViewModel.MatterTypeLookupList)
+                                                        {
+                                                            if (matterType.MatterTypeId.ToString() == ViewModel.DataCollectionAddEditViewModel.MatterTypeId)
+                                                            {
+                                                            <option value="@matterType.MatterTypeId" selected>@matterType.Name</option>
+                                                            }
+                                                            else
+                                                            {
+                                                            <option value="@matterType.MatterTypeId">@matterType.Name</option>
+                                                            }
+                                                        }
+                                                </InputSelect>
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.DataCollectionAddEditViewModel.MatterTypeId)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pt-md-2">
+                                        <div class="d-flex flex-row-reverse">
+                                            <div class="form-group">
+                                                @if (ViewModel.Debounce)
+                                                {
+                                                    <button type="submit" class="btn btn-primary btn-sm" disabled>
+                                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                        Saving...
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                                }
+                                                <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => CancelNewDataCollection())">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex pb-md-2">
+                <nav class="navbar navbar-expand-lg">
+                    <PageNavigator PageNumber="@ViewModel.DataCollectionPagedData.PageNumber" PageSize="@ViewModel.DataCollectionPagedData.PageSize"
+                                   TotalPageCount="@ViewModel.DataCollectionPagedData.TotalPageCount" PageNumberChanged="@DataCollectionPageNumberChanged"
+                                   TotalRecordCount="@ViewModel.DataCollectionPagedData.TotalRowCount" PageSizeChanged="@DataCollectionPageSizeChanged" />
+                    @if (ViewModel.DataCollectionLoading)
+                    {
+                        <div class="pl-md-2">
+                            <small>Loading...</small>
+                            <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                        </div>
+                    }
+                </nav>
+                <div class="row ml-md-auto pr-md-3">
+                    <nav class="navbar navbar-expand-lg">
+                        <MatterTypeSelector SelectedMatterTypeChanged="@OnSelectedMatterTypeFilterChanged" />
+                    </nav>
+                </div>
+            </div>
+
+            <div class="d-flex">
+                <div class="col-md-12 overflow-auto" style="max-height: 750px">
+                    <div class="table-responsive-sm">
+                        <table class="table table-sm table-striped table-hover" style="table-layout:auto">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th class="small">Id</th>
+                                    <th class="small">Label</th>
+                                    <th class="small">Matter Type</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var dataCollection in ViewModel.DataCollectionPagedData.DataCollection)
+                                {
+                                    var rowHighlighter = string.Empty;
+                                    if (dataCollection.DataCollectionId == ViewModel.SelectedDataCollection)
+                                    {
+                                        rowHighlighter = "table-info";
+                                    }
+
+                                    <tr class="@rowHighlighter" @onclick="@(() => OnDataCollectionSelected(dataCollection.DataCollectionId))">
+                                        <td class="align-middle small" style="width: 10%">@dataCollection.DataCollectionId</td>
+                                        <td class="align-middle text-nowrap small" style="width: 40%">@dataCollection.Label</td>
+                                        <td class="align-middle text-nowrap small" style="width: 30%">@dataCollection.MatterType</td>
+                                        <td class="align-middle" style="min-width: 15%">
+                                            <div class="float-right">
+                                                <button type="button" class="ml-3 form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditDataCollection(@dataCollection.DataCollectionId))">Edit</button>
+                                                <button type="button" class="form-control-sm btn btn-danger btn-sm" @onclick="@(() => DeleteDataCollection(@dataCollection.DataCollectionId))">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="d-flex">
+                <div class="pb-md-3 pl-md-3">
+                    <h4><strong>Data Fields</strong></h4>
+                </div>
+                <div class="ml-md-auto pr-md-3">
+                    <button type="button" class="form-control-sm btn btn-primary btn-sm" @onclick="@(() => AddCustomDataField())">Add +</button>
+                </div>
+            </div>
+
+            @if (ViewModel.ShowCreateDataFieldCard)
+            {
+                <div class="pl-md-3 pr-md-3 pb-md-3">
+                    <div class="card">
+                        @if (String.IsNullOrEmpty(ViewModel.DataFieldAddEditViewModel.DataFieldId))
+                        {
+                            <h5 class="card-header">Create a data field</h5>
+                        }
+                        else
+                        {
+                            <h5 class="card-header">Modify existing data field</h5>
+                        }
+                        <div class="card-body">
+                            <EditForm OnValidSubmit="@SaveDataField" EditContext="@dataFieldEditContext">
+                                <FluentValidationValidator />
+
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="dataFieldName">Name</label>
+                                                <InputText @bind-Value="ViewModel.DataFieldAddEditViewModel.Name" id="dataFieldName" class="form-control form-control-sm" FullWidth="true" />
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.DataFieldAddEditViewModel.Name)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="dataFieldLabel">Label</label>
+                                                <InputText @bind-Value="ViewModel.DataFieldAddEditViewModel.Label" id="dataFieldLabel" class="form-control form-control-sm" FullWidth="true" />
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.DataFieldAddEditViewModel.Label)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="dataFieldDescription">Description</label>
+                                                <InputText @bind-Value="ViewModel.DataFieldAddEditViewModel.Description" id="dataFieldDescription" class="form-control form-control-sm" FullWidth="true" />
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.DataFieldAddEditViewModel.Description)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if (String.IsNullOrEmpty(ViewModel.DataFieldAddEditViewModel.DataFieldId))
+                                    {
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="dataCollectionSelector">Data collection</label>
+                                                    <InputSelect id="dataCollectionSelector" @bind-Value="ViewModel.DataFieldAddEditViewModel.DataCollectionId" class="form-control form-control-sm" Required="true" FullWidth="true">
+                                                        <option value="-1">Choose...</option>
+                                                        @foreach (var dataCollection in ViewModel.DataCollectionLookupList)
+                                                                {
+                                                                    if (dataCollection.DataCollectionId.ToString() == ViewModel.DataFieldAddEditViewModel.DataCollectionId)
+                                                                    {
+                                                                <option value="@dataCollection.DataCollectionId" selected>@dataCollection.Label</option>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                <option value="@dataCollection.DataCollectionId">@dataCollection.Label</option>
+                                                                    }
+                                                                }
+                                                    </InputSelect>
+                                                    <small class="form-text text-muted">
+                                                        <ValidationMessage For="@(() => ViewModel.DataFieldAddEditViewModel.DataCollectionId)" />
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="dataTypeSelector">Data type</label>
+                                                    <InputSelect id="dataTypeSelector" @bind-Value="ViewModel.DataFieldAddEditViewModel.DataType" class="form-control form-control-sm" Required="true" FullWidth="true">
+                                                        <option value="none">Choose...</option>
+                                                        @foreach (var dataCollection in ViewModel.DataTypeLookupList)
+                                                                {
+                                                                    if (dataCollection.DisplayName == ViewModel.DataFieldAddEditViewModel.DataType)
+                                                                    {
+                                                                <option value="@dataCollection.InternalIdentifier" selected>@dataCollection.DisplayName</option>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                <option value="@dataCollection.InternalIdentifier">@dataCollection.DisplayName</option>
+                                                                    }
+                                                                }
+                                                    </InputSelect>
+                                                    <small class="form-text text-muted">
+                                                        <ValidationMessage For="@(() => ViewModel.DataFieldAddEditViewModel.DataType)" />
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="pt-md-2">
+                                        <div class="d-flex flex-row-reverse">
+                                            <div class="form-group">
+                                                @if (ViewModel.Debounce)
+                                                {
+                                                    <button type="submit" class="btn btn-primary btn-sm" disabled>
+                                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                        Saving...
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                                }
+                                                <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => CancelNewDataField())">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex pb-md-2">
+                <nav class="navbar navbar-expand-lg">
+                    <PageNavigator PageNumber="@ViewModel.DataFieldPagedData.PageNumber" PageSize="@ViewModel.DataFieldPagedData.PageSize"
+                                   TotalPageCount="@ViewModel.DataFieldPagedData.TotalPageCount" PageNumberChanged="@DataFieldPageNumberChanged"
+                                   TotalRecordCount="@ViewModel.DataFieldPagedData.TotalRowCount" PageSizeChanged="@DataFieldPageSizeChanged" />
+                    @if (ViewModel.DataFieldLoading)
+                    {
+                        <div class="pl-md-2">
+                            <small>Loading...</small>
+                            <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                        </div>
+                    }
+                </nav>
+            </div>
+
+            <div class="d-flex">
+                <div class="col-md-12 overflow-auto" style="max-height: 750px">
+                    <div class="table-responsive-sm">
+                        <table class="table table-sm table-striped table-hover" style="table-layout:auto">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th class="small">Label</th>
+                                    <th class="small">Data Type</th>
+                                    <th class="small">Description</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var dataField in ViewModel.DataFieldPagedData.DataCollection)
+                                {
+                                    <tr>
+                                        <td class="align-middle text-nowrap small" style="width: 25%">@dataField.Label</td>
+                                        <td class="align-middle text-nowrap small" style="width: 15%">@dataField.DataType</td>
+                                        <td class="align-middle text-nowrap small" style="width: 40%">
+                                            @if (!String.IsNullOrEmpty(dataField.Description) && dataField.Description.Length > 45)
+                                            {
+                                                @dataField.Description.Substring(0, 45).Insert(45, "...")
+                                            }
+                                            else
+                                            {
+                                                @dataField.Description
+                                            }
+                                        </td>
+                                        <td class="align-middle" style="min-width: 20%">
+                                            <div class="float-right">
+                                                <button type="button" class="ml-3 form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditDataField(@dataField.DataCollectionFieldId))">Edit</button>
+                                                <button type="button" class="form-control-sm btn btn-danger btn-sm" @onclick="@(() => DeleteDataField(@dataField.DataCollectionFieldId))">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

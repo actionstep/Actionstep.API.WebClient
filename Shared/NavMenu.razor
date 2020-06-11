@@ -1,0 +1,63 @@
+﻿<div class="top-row pl-4 navbar navbar-dark">
+    <div>
+        <img src="/images/Actionstep-logo-rev-hires.png" width="200" />
+    </div>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class=@IsSignedIn href="matters">
+                <span class="oi oi-file" aria-hidden="true"></span> Matters
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class=@IsSignedIn href="filenotes">
+                <span class="oi oi-list" aria-hidden="true"></span> File Notes
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class=@IsSignedIn href="documents">
+                <span class="oi oi-document" aria-hidden="true"></span> Documents
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class=@IsSignedIn href="datacollectionsandfields">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Custom Data Fields
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class=@IsSignedIn href="resthooks">
+                <span class="oi oi-cloud" aria-hidden="true"></span> REST Hooks
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class=@IsSignedIn href="dashboard">
+                <span class="oi oi-bar-chart" aria-hidden="true"></span> Dashboard
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class=@IsSignedIn href="settings">
+                <span class="oi oi-cog" aria-hidden="true"></span> Settings
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="https://docs.actionstep.com/" target="_blank">
+                <span class="oi oi-info" aria-hidden="true"></span> Developer Portal
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="https://www.actionstep.com/nz/invaders/" target="_blank">
+                <span class="oi oi-target" aria-hidden="true"></span> Time Out
+            </NavLink>
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,175 @@
+﻿@page "/matters"
+
+@using Actionstep.API.WebClient.Paging;
+@using Actionstep.API.WebClient.UI_Components;
+
+<div class="container-fluid">
+    <div class="row pt-md-5 pb-md-5">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="d-flex">
+                <div class="mr-auto">
+                    <h2><strong>Matters (Custom Field Data)</strong></h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+
+    @if (ViewModel.ShowCustomDataCard)
+    {
+        <div class="row pb-md-3">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <div class="card">
+                    <h5 class="card-header">Modify Custom Data Fields</h5>
+                    <div class="card-body">
+                        <EditForm OnValidSubmit="@SaveDataFieldValues" EditContext="@dataFieldValuesEditContext">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Data Collection</label>
+                                            <DataCollectionSelector FilterByMatterType="@ViewModel.ModifyMatterDataFieldsViewModel.MatterTypeId" SelectedDataCollectionChanged="OnEditMatterDataSelectedDataCollectionChanged" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        @foreach (var dataField in ViewModel.ModifyMatterDataFieldsViewModel.DataFields.Values)
+                                        {
+                                            <div class="form-group">
+                                                <label for="@dataField.DataFieldId">@dataField.Label</label>
+                                                <InputText @bind-Value="ViewModel.ModifyMatterDataFieldsViewModel.DataFields[dataField.DataFieldId].Value" id="@dataField.DataFieldId" class="form-control form-control-sm" FullWidth="true" />
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.ModifyMatterDataFieldsViewModel.DataFields[dataField.DataFieldId].Value)" />
+                                                </small>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="pt-md-2">
+                                    <div class="d-flex flex-row-reverse">
+                                        <div class="form-group">
+                                            @if (ViewModel.Debounce)
+                                            {
+                                                <button type="submit" class="btn btn-primary btn-sm" disabled>
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                    Saving...
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                            }
+                                            <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => CancelDataFieldValues())">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+    }
+
+    <div class="row pb-md-3">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="d-flex">
+                <nav class="navbar navbar-expand-lg ml-n3">
+                    <PageNavigator PageNumber="@ViewModel.MatterPagedData.PageNumber" PageSize="@ViewModel.MatterPagedData.PageSize"
+                                   TotalPageCount="@ViewModel.MatterPagedData.TotalPageCount" PageNumberChanged="@PageNumberChanged"
+                                   TotalRecordCount="@ViewModel.MatterPagedData.TotalRowCount" PageSizeChanged="@PageSizeChanged" />
+                    @if (ViewModel.Loading)
+                    {
+                        <div class="pl-md-2">
+                            <small>Loading...</small>
+                            <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                        </div>
+                    }
+                </nav>
+                <div class="row ml-auto">
+                    <nav class="navbar navbar-expand-lg">
+                        <MatterTypeSelector SelectedMatterTypeChanged="@OnSelectedMatterTypeFilterChanged" />
+                    </nav>
+                    <nav class="navbar navbar-expand-lg">
+                        <DataCollectionSelector FilterByMatterType="@ViewModel.FilterByMatterType"
+                                                SelectedDataCollectionChanged="@OnSelectedDataCollectionChanged"
+                                                InitialSelection="@ViewModel.SelectedDataCollection" />
+                    </nav>
+                    <nav class="navbar navbar-expand-lg">
+                        <DataFieldSelector FilterByDataCollection="@ViewModel.FilterByDataCollection" SelectedDataFieldChanged="@OnSelectedDataFieldChanged" />
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="overflow-auto" style="max-height: 750px">
+                <div class="table-responsive-sm">
+                    <table class="table table-sm table-striped table-hover" style="table-layout:auto">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th class="small">Id</th>
+                                <th class="small">Name</th>
+                                <th class="small">Matter Type</th>
+
+                                @foreach (var displayColumn in ViewModel.DisplayColumns)
+                                {
+                                    if (displayColumn.Visible)
+                                    {
+                                        <th class="small">@displayColumn.Label</th>
+                                    }
+                                }
+
+                                <th class="small">Status</th>
+                                <th class="small">Assigned To</th>
+                                <th class="small">Last Modified</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var matter in ViewModel.MatterPagedData.DataCollection)
+                            {
+                                <tr>
+                                    <td class="align-middle small" style="width: 3%">@matter.MatterId</td>
+                                    <td class="align-middle text-nowrap small" style="width: 32%">@matter.Name</td>
+                                    <td class="align-middle text-nowrap small" style="width: 20%">@matter.MatterType</td>
+
+                                    @foreach (var displayColumn in ViewModel.DisplayColumns)
+                                    {
+                                        if (displayColumn.Visible)
+                                        {
+                                            if (ViewModel.CustomData.ContainsKey(matter.MatterId) && ViewModel.CustomData[matter.MatterId].ContainsKey(displayColumn.DataCollectionFieldId))
+                                            {
+                                                <td class="align-middle text-nowrap small" style="width: 15%">@ViewModel.CustomData[matter.MatterId][displayColumn.DataCollectionFieldId]</td>
+                                            }
+                                            else
+                                            {
+                                                <td class="align-middle text-nowrap small"></td>
+                                            }
+                                        }
+                                    }
+
+                                    <td class="align-middle text-nowrap small" style="width: 15%">@matter.Status</td>
+                                    <td class="align-middle text-nowrap small" style="width: 13%">@matter.AssignedTo</td>
+                                    <td class="align-middle text-nowrap small" style="width: 12%">@matter.LastModified.ToString("ddd dd-MMM-yyyy HH:mm")</td>
+                                    <td class="align-middle" style="min-width: 5%">
+                                        <button type="button" class="ml-3 form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditCustomData(matter.MatterId, matter.MatterTypeId))">Edit</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1"></div>
+</div>

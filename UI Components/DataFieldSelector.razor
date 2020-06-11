@@ -1,0 +1,21 @@
+﻿<div class="dropdown">
+    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenu2" @onclick="@DisplayMenu" data-toggle="dropdown">
+        Data Field Selector
+    </button>
+    @if (DataFieldLookupList.Any())
+    {
+        <div class="dropdown-menu dropdown-menu-sm-right @(ShowMenu ? "show" : "")">
+            @foreach (var dataField in DataFieldLookupList.Where(x => x.DataCollectionId == FilterByDataCollection).OrderBy(x => x.Label))
+            {
+                <div class="custom-control custom-checkbox ml-md-3 mr-md-3">
+
+                    <input type="checkbox" class="custom-control-input" id="@dataField.DataCollectionFieldId"
+                           @bind-value="@dataField.Selected"
+                           @oninput="@(() => OnSelectedDataFieldChanged(dataField.DataCollectionFieldId))" />
+
+                    <label for="@dataField.DataCollectionFieldId" class="custom-control-label text-nowrap">@dataField.Label</label>
+                </div>
+            }
+        </div>
+    }
+</div>

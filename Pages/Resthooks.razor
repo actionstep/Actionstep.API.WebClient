@@ -1,0 +1,199 @@
+﻿@page "/resthooks"
+
+@using Actionstep.API.WebClient.Paging;
+@using Actionstep.API.WebClient.Validators;
+
+<div class="container-fluid">
+    <div class="row pt-md-5 pb-md-5">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="d-flex">
+                <div class="mr-auto">
+                    <h2><strong>REST Hooks</strong></h2>
+                </div>
+                <button type="button" class="form-control-sm btn btn-primary btn-sm" @onclick="@(() => AddResthook())">Add +</button>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+
+    @if (ViewModel.ShowResthookCard)
+    {
+        <div class="row pb-md-5">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <div class="card">
+                    @if (ViewModel.AddEditViewModel.ResthookId == 0)
+                    {
+                        <h5 class="card-header">Create a REST hook</h5>
+                    }
+                    else
+                    {
+                        <h5 class="card-header">Modify existing REST hook</h5>
+                    }
+                    <div class="card-body">
+                        <EditForm OnValidSubmit="@SaveResthook" EditContext="@resthookEditContext">
+                            <FluentValidationValidator />
+
+                            <div class="container-fluid">
+                                <div class="row">
+                                    @if (ViewModel.AddEditViewModel.ResthookId == 0)
+                                    {
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="matterSelector">Select Event</label>
+                                                <InputSelect id="matterSelector" @bind-Value="ViewModel.AddEditViewModel.EventName" class="form-control form-control-sm" FullWidth="true">
+                                                    <option value="-1">Choose...</option>
+                                                    @foreach (var eventName in ViewModel.EventNameLookupList)
+                                                    {
+                                                        if (eventName == ViewModel.AddEditViewModel.EventName)
+                                                        {
+                                                            <option value="@eventName" selected>@eventName</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@eventName">@eventName</option>
+                                                        }
+                                                    }
+                                                </InputSelect>
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.AddEditViewModel.EventName)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="targetUrl">Target Url</label>
+                                            <InputText @bind-Value="ViewModel.AddEditViewModel.TargetUrl" id="targetUrl" class="form-control form-control-sm" FullWidth="true" />
+                                            <small class="form-text text-muted">
+                                                <ValidationMessage For="@(() => ViewModel.AddEditViewModel.TargetUrl)" />
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row pt-md-2">
+                                    <div class="col-md-12">
+                                        <div class="d-flex flex-row-reverse">
+                                            <div class="form-group">
+                                                @if (ViewModel.Debounce)
+                                                {
+                                                    <button type="submit" class="btn btn-primary btn-sm" disabled>
+                                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                        Saving...
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                                }
+                                                <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => CancelNewResthook())">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+    }
+
+    <div class="row pb-md-3">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="d-flex">
+                @if (ViewModel.EnableMultipleDelete)
+                {
+                    <nav class="navbar navbar-expand-lg ml-n3">
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="@(() => DeleteResthooks())">Delete Selected</button>
+                    </nav>
+                }
+
+                <nav class="navbar navbar-expand-lg ml-n3">
+                    <PageNavigator PageNumber="@ViewModel.ResthookPagedData.PageNumber" PageSize="@ViewModel.ResthookPagedData.PageSize"
+                                   TotalPageCount="@ViewModel.ResthookPagedData.TotalPageCount" PageNumberChanged="@PageNumberChanged"
+                                   TotalRecordCount="@ViewModel.ResthookPagedData.TotalRowCount" PageSizeChanged="@PageSizeChanged" />
+                    @if (ViewModel.Loading)
+                    {
+                        <div class="pl-md-2">
+                            <small>Loading...</small>
+                            <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                        </div>
+                    }
+                </nav>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+
+    <EditForm OnValidSubmit="@DeleteResthooks" EditContext="@multiDeleteEditContext">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <div class="overflow-auto" style="max-height: 750px">
+                    <div class="table-responsive-sm">
+                        <table class="table table-sm table-striped table-hover" style="table-layout:auto">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th></th>
+                                    <th class="small">Id</th>
+                                    <th class="small">Event Name</th>
+                                    <th class="small">Target Url</th>
+                                    <th class="small">Status</th>
+                                    <th class="small">Triggered Count</th>
+                                    <th class="small">Last Triggered</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var resthook in ViewModel.ResthookPagedData.DataCollection)
+                                {
+                                    var rowHighlighter = string.Empty;
+                                    if (resthook.ResthookId == ViewModel.ResthookBeingEdited)
+                                    {
+                                        rowHighlighter = "table-info";
+                                    }
+
+                                    <tr class="@rowHighlighter">
+                                        <td class="align-middle" style="width: 4%">
+                                            <div class="custom-control custom-checkbox ml-2">
+                                                <input type="checkbox" class="custom-control custom-checkbox custom-control-input" id="@resthook.ResthookId"
+                                                       checked="@resthook.Selected" @onchange="@((e) => CanMultipleDelete(resthook.ResthookId, e))" />
+                                                <label class="custom-control-label" for="@resthook.ResthookId"></label>
+                                            </div>
+                                        </td>
+                                        <td class="align-middle small" style="width: 3%">@resthook.ResthookId</td>
+                                        <td class="align-middle text-nowrap small" style="width: 15%">@resthook.EventName</td>
+                                        <td class="align-middle text-nowrap small" style="width: 32%">@resthook.TargetUrl</td>
+                                        <td class="align-middle text-nowrap small" style="width: 10%">@resthook.Status</td>
+                                        <td class="align-middle text-nowrap small" style="width: 10%">@resthook.TriggeredCount</td>
+
+                                        @if (resthook.LastTriggered.HasValue)
+                                        {
+                                            <td class="align-middle text-nowrap small" style="width: 15%">@resthook.LastTriggered.Value.ToString("ddd dd-MMM-yyyy HH:mm")</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="align-middle text-nowrap small" style="width: 15%"></td>
+                                        }
+
+                                        <td class="align-middle" style="width: 15%">
+                                            <div class="float-right">
+                                                <button type="button" class="ml-3 form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditResthook(resthook.ResthookId))">Edit</button>
+                                                <button type="button" class="form-control-sm btn btn-danger btn-sm" @onclick="@(() => DeleteResthook(resthook.ResthookId))">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </EditForm>
+</div>

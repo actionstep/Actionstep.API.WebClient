@@ -1,0 +1,3 @@
+﻿<input type="text" class="form-control form-control-sm" FullWidth="true" placeholder="search"
+       @bind-value="SearchText" @bind-value:event="oninput" @onkeyup="@(() => SearchFor())" />
+<button type="button" class="form-control-sm btn btn-info btn-sm" @onclick="@(() => ClearSearch())">Clear</button>

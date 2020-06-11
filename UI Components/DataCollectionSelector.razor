@@ -1,0 +1,7 @@
+﻿<select id="dataCollectionSelector" class="form-control form-control-sm" FullWidth="true" @bind="@InitialSelection"  >
+    <option value=@(-1)>(Select data collection)</option>
+    @foreach (var dataCollection in DataCollectionLookupList.Where(x => x.MatterTypeId == FilterByMatterType).OrderBy(x => x.Label))
+    {
+        <option value="@dataCollection.DataCollectionId">@dataCollection.Label</option>
+    }
+</select>

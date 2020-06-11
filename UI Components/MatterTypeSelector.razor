@@ -1,0 +1,14 @@
+﻿<select id="matterTypeSelector" @onchange="OnSelectedMatterTypeChanged" class="form-control form-control-sm" FullWidth="true">
+    <option value="-1">(Filter by matter type)</option>
+    @foreach (var matterType in MatterTypeLookupList.OrderBy(x => x.Name))
+    {
+        if (matterType.MatterTypeId == InitialSelectedMatterTypeId)
+        {
+            <option value="@matterType.MatterTypeId" selected>@matterType.Name</option>
+        }
+        else
+        {
+            <option value="@matterType.MatterTypeId">@matterType.Name</option>
+        }
+    }
+</select>

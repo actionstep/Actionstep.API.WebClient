@@ -1,0 +1,14 @@
+﻿<select id="matterSelector" @onchange="OnSelectedMatterChanged" class="form-control form-control-sm" FullWidth="true">
+    <option value="-1">(Filter by matter)</option>
+    @foreach (var matter in MatterLookupList)
+    {
+        if (matter.MatterId == InitialSelectedMatterId)
+        {
+            <option value="@matter.MatterId" selected>@matter.Name</option>
+        }
+        else
+        {
+            <option value="@matter.MatterId">@matter.Name</option>
+        }
+    }
+</select>

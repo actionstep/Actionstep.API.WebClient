@@ -1,0 +1,221 @@
+﻿@page "/documents"
+
+@using Actionstep.API.WebClient.Paging;
+@using Actionstep.API.WebClient.UI_Components;
+@using Actionstep.API.WebClient.Validators;
+@using BlazorInputFile; 
+
+    <div class="container-fluid">
+        <div class="row pt-md-5 pb-md-5">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <div class="d-flex">
+                    <div class="mr-auto">
+                        <h2><strong>Matter Documents</strong></h2>
+                    </div>
+                    <button type="button" class="form-control-sm btn btn-primary btn-sm" @onclick="@(() => AddNewDocument())">Add +</button>
+                </div>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+
+        @if (ViewModel.ShowNewDocumentCard)
+        {
+            <div class="row pb-md-5">
+                <div class="col-md-1"></div>
+                <div class="col-md-10">
+                    <div class="card">
+                        @if (ViewModel.AddEditViewModel.DocumentId == 0)
+                        {
+                            <h5 class="card-header">Create a document</h5>
+                        }
+                        else
+                        {
+                            <h5 class="card-header">Modify existing document</h5>
+                        }
+                        <div class="card-body">
+                            <EditForm OnValidSubmit="@SaveDocument" EditContext="@documentEditContext">
+                                <FluentValidationValidator />
+
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="matterSelector">Select Matter</label>
+                                                <InputSelect id="matterSelector" @bind-Value="ViewModel.AddEditViewModel.ActionId" class="form-control form-control-sm" Required="true" FullWidth="true">
+                                                    <option value="-1">Choose...</option>
+                                                    @foreach (var matter in ViewModel.MatterLookupList)
+                                                    {
+                                                        if (matter.MatterId.ToString() == ViewModel.AddEditViewModel.ActionId)
+                                                        {
+                                                            <option value="@matter.MatterId" selected>@matter.Name</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@matter.MatterId">@matter.Name</option>
+                                                        }
+                                                    }
+                                                </InputSelect>
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.AddEditViewModel.ActionId)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label for="docname">Name</label>
+                                                <InputText @bind-Value="ViewModel.AddEditViewModel.Name" id="docname" class="form-control form-control-sm" Required="true" FullWidth="true" />
+                                                <small class="form-text text-muted">
+                                                    <ValidationMessage For="@(() => ViewModel.AddEditViewModel.Name)" />
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-md-2">
+                                        <div class="col-md-6">
+                                            @if (ViewModel.AddEditViewModel.DocumentId == 0)
+                                            {
+                                            <div class="form-group">
+                                                <div class="custom-file">
+                                                    <InputFile class="form-control form-control-sm custom-file-input" id="docToUpload" OnChange="OnFileSelectionChanged" />
+                                                    <label class="form-control form-control-sm custom-file-label" for="docToUpload">
+                                                        @if (ViewModel.AddEditViewModel.UploadFile != null)
+                                                        {
+                                                            @ViewModel.AddEditViewModel.UploadFile.Name
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>Choose file to upload...</span>
+                                                        }
+                                                    </label>
+                                                    <small class="form-text text-muted">
+                                                        <ValidationMessage For="@(() => ViewModel.AddEditViewModel.UploadFile)" />
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            }
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex flex-row-reverse">
+                                                <div class="form-group">
+                                                    @if (ViewModel.Debounce)
+                                                    {
+                                                        <button type="submit" class="btn btn-primary btn-sm" disabled>
+                                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                            Saving...
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                                    }
+                                                    <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => CancelNewDocument())">Cancel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+        }
+
+        <div class="row pb-md-3">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <div class="d-flex">
+                    @if (ViewModel.EnableMultipleDelete)
+                    {
+                        <nav class="navbar navbar-expand-lg ml-n3">
+                            <button type="button" class="btn btn-danger btn-sm" @onclick="@(() => DeleteDocuments())">Delete Selected</button>
+                        </nav>
+                    }
+                    <nav class="navbar navbar-expand-lg ml-n3">
+                        <PageNavigator PageNumber="@ViewModel.DocumentPagedData.PageNumber" PageSize="@ViewModel.DocumentPagedData.PageSize"
+                                       TotalPageCount="@ViewModel.DocumentPagedData.TotalPageCount" PageNumberChanged="@PageNumberChanged"
+                                       TotalRecordCount="@ViewModel.DocumentPagedData.TotalRowCount" PageSizeChanged="@PageSizeChanged" />
+                        @if (ViewModel.Loading)
+                        {
+                            <div class="pl-md-2">
+                                <small>Loading...</small>
+                                <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                            </div>
+                        }
+                    </nav>
+                    <div class="row ml-auto">
+                        <nav class="navbar navbar-expand-lg">
+                            <MatterSelector SelectedMatterChanged="@SelectedMatterFilterChanged" />
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+
+        <EditForm OnValidSubmit="@DeleteDocuments" EditContext="@multiDeleteEditContext">
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-md-10">
+                    <div class="overflow-auto" style="max-height: 750px">
+                        <div class="table-responsive-sm">
+                            <table class="table table-sm table-striped table-hover" style="table-layout:auto">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th></th>
+                                        <th class="small">Id</th>
+                                        <th class="small">Name</th>
+                                        <th class="small">Associated with Matter</th>
+                                        <th class="small">Created</th>
+                                        <th class="small">Created By</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var document in ViewModel.DocumentPagedData.DataCollection)
+                                    {
+                                        <tr>
+                                            <td class="align-middle" style="width: 4%">
+                                                <div class="custom-control custom-checkbox ml-2">
+                                                    <input type="checkbox" class="custom-control custom-checkbox custom-control-input" id="@document.DocumentId"
+                                                           checked="@document.Selected" @onchange="@((e) => CanMultipleDelete(document.DocumentId, e))" />
+                                                    <label class="custom-control-label" for="@document.DocumentId"></label>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle small" style="width: 3%">@document.DocumentId</td>
+                                            <td class="align-middle small" style="width: 39%">@document.Name</td>
+                                            <td class="align-middle text-nowrap small" style="width: 15%">@document.MatterName</td>
+                                            <td class="align-middle text-nowrap small" style="width: 12%">@document.Created.ToString("ddd dd-MMM-yyyy HH:mm")</td>
+                                            <td class="align-middle text-nowrap small" style="width: 8%">@document.CreatedBy</td>
+                                            <td class="align-middle" style="width: 15%">
+                                                <div class="float-right">
+                                                    @if (ViewModel.IsDownloading && ViewModel.DownloadingDocumentId == document.DocumentId)
+                                                    {
+                                                        <button type="button" class="ml-3 form-control-sm btn btn-info btn-sm" disabled
+                                                                @onclick="@(() => DownloadDocument(document.DocumentId))">
+                                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                            Downloading...
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button" class="ml-3 form-control-sm btn btn-info btn-sm" @onclick="@(() => DownloadDocument(document.DocumentId))">Download</button>
+                                                    }
+                                                    <button type="button" class="form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditDocument(document.DocumentId))">Edit</button>
+                                                    <button type="button" class="form-control-sm btn btn-danger btn-sm" @onclick="@(() => DeleteDocument(document.DocumentId))">Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1"></div>
+        </EditForm>
+    </div>

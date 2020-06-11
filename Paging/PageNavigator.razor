@@ -1,0 +1,53 @@
+﻿<div class="btn-toolbar" role="toolbar">
+    <div class="btn-group-sm mr-sm-1" role="group">
+        <button type="button" class="btn btn-info btn-sm" @onclick="@(() => OnPreviousPageClicked())">Previous</button>
+    </div>
+    <div class="btn-group-sm mr-sm-1" role="group">
+        @for (var pageNo = StartIndex; pageNo <= FinishIndex; pageNo++)
+        {
+            int i = pageNo;
+            if (pageNo == PageNumber)
+            {
+                <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => OnPageNumberChanged(@i))">@i</button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-info btn-sm" @onclick="@(() => OnPageNumberChanged(@i))">@i</button>
+            }
+        }
+    </div>
+    <div class="btn-group-sm" role="group">
+        <button type="button" class="btn btn-info btn-sm" @onclick="@(() => OnNextPageClicked())">Next</button>
+    </div>
+</div>
+<div class="col-md-auto">
+    <small>Page size:</small>
+    <select id="pageSizeSelector" class="form-control-sm" FullWidth="false" @onchange="OnPageSizeChanged">
+        @foreach (var pageSize in AvailablePageSizes)
+        {
+            var isSelected = pageSize == PageSize;
+            @if (isSelected)
+            {
+                <option value="@pageSize" selected>
+                    @pageSize
+                </option>
+            }
+            else
+            {
+                <option value="@pageSize">
+                    @pageSize
+                </option>
+            }
+        }
+    </select>
+</div>
+<div class="col-md-auto">
+    <div class="small">
+        Pages: <strong>@TotalPageCount</strong>
+    </div>
+</div>
+<div class="col-md-auto">
+    <div class="small">
+        Records: <strong>@TotalRecordCount</strong>
+    </div>
+</div>
