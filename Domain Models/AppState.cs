@@ -21,11 +21,19 @@ namespace Actionstep.API.WebClient.Domain_Models
 
         public event Action OnChange;
 
-
         public void SetSignInState(bool isSignedIn)
         {
             _isSignedIn = isSignedIn;
             OnChange?.Invoke();
+        }
+
+
+
+        public event Action OnFilenoteResthookReceived;
+
+        public void FilenoteResthookReceived()
+        {
+            OnFilenoteResthookReceived?.Invoke();
         }
     }
 }

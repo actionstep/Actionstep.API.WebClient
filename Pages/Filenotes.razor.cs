@@ -11,6 +11,7 @@ namespace Actionstep.API.WebClient.Pages
 {
     public partial class Filenotes
     {
+        [Inject] private AppState _appState { get; set; }
         [Inject] private ActionstepApi _api { get; set; }
 
         private EditContext filenoteEditContext;
@@ -21,9 +22,17 @@ namespace Actionstep.API.WebClient.Pages
 
         protected override void OnInitialized()
         {
+            _appState.OnFilenoteResthookReceived += _appState_OnFilenoteResthookReceived;
+
+
             ViewModel = new FilenotesViewModel();
             multiDeleteEditContext = new EditContext(ViewModel);
             base.OnInitialized();
+        }
+
+        private void _appState_OnFilenoteResthookReceived()
+        {
+
         }
 
 
