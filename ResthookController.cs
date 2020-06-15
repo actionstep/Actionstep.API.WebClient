@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Actionstep.API.WebClient.Data_Transfer_Objects.Responses;
+﻿using Actionstep.API.WebClient.Data_Transfer_Objects.Responses;
 using Actionstep.API.WebClient.Domain_Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Actionstep.API.WebClient
 {
@@ -25,24 +18,20 @@ namespace Actionstep.API.WebClient
 
 
         [HttpPost]
-        public IActionResult IndexAsync([FromBody] ResthookResponseDto responseData) // ResthookResponseDto responseData)
+        public IActionResult Index([FromBody] ResthookResponseDto responseData)
         {
-            _appState.FilenoteResthookReceived();
+            var filenoteResthookData = new FilenoteResthookResponseData()
+            {
+                ResthookType = responseData.data.type,
+                FilenoteId = Convert.ToInt32(responseData.data.id),
+                Created = responseData.data.attributes.enteredTimestamp,
+                CreatedBy = responseData.data.attributes.enteredBy,
+                Content = responseData.data.attributes.text
+            };
             
-
-            //string json = new StreamReader(HttpContext.Request.Body).ReadToEnd(); //.ReadToEndAsync();
-
+            _appState.FilenoteResthookReceived(filenoteResthookData);
 
             return Ok();
         }
-
-
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok("Hello World");
-        }
-
-
     }
 }

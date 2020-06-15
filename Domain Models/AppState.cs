@@ -28,12 +28,11 @@ namespace Actionstep.API.WebClient.Domain_Models
         }
 
 
+        public event Action<FilenoteResthookResponseData> OnFilenoteResthookReceived;
 
-        public event Action OnFilenoteResthookReceived;
-
-        public void FilenoteResthookReceived()
+        public void FilenoteResthookReceived(FilenoteResthookResponseData responseData)
         {
-            OnFilenoteResthookReceived?.Invoke();
+            OnFilenoteResthookReceived?.Invoke(responseData);
         }
     }
 }

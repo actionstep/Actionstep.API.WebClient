@@ -1,6 +1,7 @@
 ﻿using Actionstep.API.WebClient.Domain_Models;
 using Actionstep.API.WebClient.Paging;
 using Actionstep.API.WebClient.View_Models;
+using Blazored.Toast.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System;
@@ -13,6 +14,7 @@ namespace Actionstep.API.WebClient.Pages
     {
         [Inject] private AppState _appState { get; set; }
         [Inject] private ActionstepApi _api { get; set; }
+        [Inject] private IToastService _toastService { get; set; }
 
         private EditContext filenoteEditContext;
         private EditContext multiDeleteEditContext;
@@ -22,17 +24,11 @@ namespace Actionstep.API.WebClient.Pages
 
         protected override void OnInitialized()
         {
-            _appState.OnFilenoteResthookReceived += _appState_OnFilenoteResthookReceived;
-
+            _appState.OnFilenoteResthookReceived += OnFilenoteResthookReceived;
 
             ViewModel = new FilenotesViewModel();
             multiDeleteEditContext = new EditContext(ViewModel);
             base.OnInitialized();
-        }
-
-        private void _appState_OnFilenoteResthookReceived()
-        {
-
         }
 
 
@@ -54,7 +50,6 @@ namespace Actionstep.API.WebClient.Pages
             ViewModel.FilenotePagedData = new Page<FilenoteViewModel>(filenotesDto.PageMetaDataDto.PageNumber, filenotesDto.PageMetaDataDto.PageSize,
                                                                       filenotesDto.PageMetaDataDto.PageCount, filenotesDto.PageMetaDataDto.RecordCount,
                                                                       ConversionFactory.ConvertToDomainModel(filenotesDto));
-
             ViewModel.Loading = false;
         }
 
@@ -187,6 +182,35 @@ namespace Actionstep.API.WebClient.Pages
             }
 
             ViewModel.Debounce = false;
+        }
+
+
+        private void OnFilenoteResthookReceived(FilenoteResthookResponseData e)
+        {
+            _toastService.ShowInfo(BuildToastMessage(e), "New Filenote");
+        }
+
+
+        private RenderFragment BuildToastMessage(FilenoteResthookResponseData data)
+        {
+            RenderFragment toastContent;
+
+            toastContent = x =>
+            {
+                x.OpenElement(0, "div");
+                x.AddContent(1, $"Created By: {data.CreatedBy}");
+                x.CloseElement();
+
+                x.OpenElement(2, "div");
+                x.AddContent(3, $"Created: {data.Created:ddd dd-MMM-yyyy HH:mm}");
+                x.CloseElement();
+
+                x.OpenElement(4, "div");
+                x.AddContent(5, $"Content: {data.Content}");
+                x.CloseElement();
+            };
+
+            return toastContent;
         }
     }
 }

@@ -1,4 +1,5 @@
 using Actionstep.API.WebClient.Domain_Models;
+using Blazored.Toast;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Actionstep.API.WebClient
 {
-
-    // Ngrok: from the cmd prompt: ngrok http 50241 -host-header="localhost:50241"
-
+    // Ngrok: from the cmd prompt => ngrok http 50241 -host-header="localhost:50241"
 
     public class Startup
     {
@@ -30,17 +29,16 @@ namespace Actionstep.API.WebClient
             services.AddMvc(options => options.EnableEndpointRouting = false)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-
-
             // Load the app's configuration settings from appsettings.json into the AppConfiguration class.
             var appConfiguration = new AppConfiguration();
             Configuration.Bind("AppConfiguration", appConfiguration);
             services.AddSingleton(typeof(AppConfiguration), appConfiguration);
 
-            //services.AddBlazoredSessionStorage();
             services.AddHttpClient<ActionstepApi>();
 
             services.AddSingleton<AppState>();
+
+            services.AddBlazoredToast();
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
@@ -57,19 +55,19 @@ namespace Actionstep.API.WebClient
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-
-                app.UseHttpsRedirection();
             }
 
-            //app.UseHttpsRedirection();
+            // NB: If Https redirection is enabled the rest hook controller will not receive the incoming call.
+            //     This is only to allow Ngrok to be used to proxy external incoming rest hooks to localhost.
+            //     Uncomment in a production environment.
+            //
+            // app.UseHttpsRedirection();
+
             app.UseStaticFiles();
             app.UseRouting();
 
-
             app.UseMvcWithDefaultRoute();
-
 
             app.UseEndpoints(endpoints =>
             {

@@ -14,6 +14,7 @@
     <base href="~/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
+    <link href="_content/Blazored.Toast/blazored-toast.min.css" rel="stylesheet" />
 </head>
 <body>
     <app>
@@ -37,7 +38,7 @@
     <script type="text/javascript">
         function saveAsFile(filename, bytesBase64) {
             if (navigator.msSaveBlob) {
-                //Download document in Edge browser
+                // Download document in Edge browser
                 var data = window.atob(bytesBase64);
                 var bytes = new Uint8Array(data.length);
                 for (var i = 0; i < data.length; i++) {
