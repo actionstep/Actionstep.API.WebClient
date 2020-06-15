@@ -35,9 +35,7 @@ namespace Actionstep.API.WebClient
             services.AddSingleton(typeof(AppConfiguration), appConfiguration);
 
             services.AddHttpClient<ActionstepApi>();
-
             services.AddSingleton<AppState>();
-
             services.AddBlazoredToast();
 
             services.AddRazorPages();
