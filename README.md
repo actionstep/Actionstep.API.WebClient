@@ -33,27 +33,16 @@ created using the data collections and fields page.
 
 The REST hooks page demonstrates how to register a web hook for an Actionstep event (the FileNoteCreated event) and how to respond to received callbacks.
 
-## Getting Started
+### Technology Stack
 
-
-### Configuration and Settings
-
-
-
-
-
-##### Technology Stack
-
-The application is built using Microsoft .NET Core and Blazor (the new Web Assembly technology for building web applications).
-To build and run the application you will need to install Microsoft Visual Studio (Community Preview Edition) which is free to download and install.
+The application is built using Microsoft .NET Core and Blazor (the new Web Assembly technology for building web applications in native languages).
+To build and run the application you will need to install [Microsoft Visual Studio (Community Preview Edition)](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=community&ch=pre&rel=16) which is free to download and install.
 The source code includes a number of third-party open source components from Github, for example, Newtonsoft Json, and the Polly retry library.
 
-###### Ngrok
+#### Ngrok
 
 In order to demonstrate the use of OAuth and REST (web) hooks from your local development environment we recommend using [Ngrok](https://ngrok.com/) to proxy 
 incoming responses back to your localhost environment.  
-
-
 
 ###### Disclaimer
 
