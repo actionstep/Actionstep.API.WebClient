@@ -181,7 +181,7 @@
                                         <td class="align-middle text-nowrap small" style="width: 15%">@filenote.MatterName</td>
                                         <td class="align-middle text-nowrap small" style="width: 12%">@filenote.Created.ToString("ddd dd-MMM-yyyy HH:mm")</td>
                                         <td class="align-middle text-nowrap small" style="width: 8%">@filenote.CreatedBy</td>
-                                        <td class="align-middle" style="width: 10%">
+                                        <td class="align-middle text-nowrap" style="width: 10%">
                                             <div class="float-right">
                                                 <button type="button" class="ml-3 form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditFilenote(@filenote.FilenoteId))">Edit</button>
                                                 <button type="button" class="form-control-sm btn btn-danger btn-sm" @onclick="@(() => DeleteFilenote(@filenote.FilenoteId))">Delete</button>

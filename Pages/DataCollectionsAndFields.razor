@@ -189,7 +189,7 @@
                                         <td class="align-middle small" style="width: 10%">@dataCollection.DataCollectionId</td>
                                         <td class="align-middle text-nowrap small" style="width: 40%">@dataCollection.Label</td>
                                         <td class="align-middle text-nowrap small" style="width: 30%">@dataCollection.MatterType</td>
-                                        <td class="align-middle" style="min-width: 15%">
+                                        <td class="align-middle text-nowrap" style="min-width: 15%">
                                             <div class="float-right">
                                                 <button type="button" class="ml-3 form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditDataCollection(@dataCollection.DataCollectionId))">Edit</button>
                                                 <button type="button" class="form-control-sm btn btn-danger btn-sm" @onclick="@(() => DeleteDataCollection(@dataCollection.DataCollectionId))">Delete</button>
@@ -381,7 +381,7 @@
                                                 @dataField.Description
                                             }
                                         </td>
-                                        <td class="align-middle" style="min-width: 20%">
+                                        <td class="align-middle text-nowrap" style="min-width: 20%">
                                             <div class="float-right">
                                                 <button type="button" class="ml-3 form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditDataField(@dataField.DataCollectionFieldId))">Edit</button>
                                                 <button type="button" class="form-control-sm btn btn-danger btn-sm" @onclick="@(() => DeleteDataField(@dataField.DataCollectionFieldId))">Delete</button>

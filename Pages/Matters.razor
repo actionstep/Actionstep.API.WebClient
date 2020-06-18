@@ -160,7 +160,7 @@
                                     <td class="align-middle text-nowrap small" style="width: 15%">@matter.Status</td>
                                     <td class="align-middle text-nowrap small" style="width: 13%">@matter.AssignedTo</td>
                                     <td class="align-middle text-nowrap small" style="width: 12%">@matter.LastModified.ToString("ddd dd-MMM-yyyy HH:mm")</td>
-                                    <td class="align-middle" style="min-width: 5%">
+                                    <td class="align-middle text-nowrap" style="min-width: 5%">
                                         <button type="button" class="ml-3 form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditCustomData(matter.MatterId, matter.MatterTypeId))">Edit</button>
                                     </td>
                                 </tr>
