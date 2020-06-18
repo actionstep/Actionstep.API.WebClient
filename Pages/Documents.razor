@@ -190,7 +190,7 @@
                                             <td class="align-middle text-nowrap small" style="width: 15%">@document.MatterName</td>
                                             <td class="align-middle text-nowrap small" style="width: 12%">@document.Created.ToString("ddd dd-MMM-yyyy HH:mm")</td>
                                             <td class="align-middle text-nowrap small" style="width: 8%">@document.CreatedBy</td>
-                                            <td class="align-middle" style="width: 15%">
+                                            <td class="align-middle text-nowrap" style="min-width: 206px">
                                                 <div class="float-right">
                                                     @if (ViewModel.IsDownloading && ViewModel.DownloadingDocumentId == document.DocumentId)
                                                     {
