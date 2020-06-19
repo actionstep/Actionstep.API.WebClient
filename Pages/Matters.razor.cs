@@ -125,8 +125,11 @@ namespace Actionstep.API.WebClient.Pages
 
         public void EditCustomData(int matterId, int matterTypeId)
         {
-            ViewModel.ModifyMatterDataFieldsViewModel.MatterId = matterId;
-            ViewModel.ModifyMatterDataFieldsViewModel.MatterTypeId = matterTypeId;
+            ViewModel.ModifyMatterDataFieldsViewModel = new MattersViewModel.ModifyDataFieldsViewModel
+            {
+                MatterId = matterId,
+                MatterTypeId = matterTypeId
+            };
 
             dataFieldValuesEditContext = new EditContext(ViewModel.ModifyMatterDataFieldsViewModel);
             ViewModel.ShowCustomDataCard = !ViewModel.ShowCustomDataCard;
@@ -135,6 +138,8 @@ namespace Actionstep.API.WebClient.Pages
 
         public async Task OnEditMatterDataSelectedDataCollectionChanged(int dataCollectionId)
         {
+            ViewModel.ModifyMatterDataFieldsViewModel.DataFields.Clear();
+
             var dataFields = await _api.GetDataCollectionFieldsAsync(dataCollectionId);
 
             foreach (var dataField in dataFields.DataCollectionFields)
@@ -151,15 +156,12 @@ namespace Actionstep.API.WebClient.Pages
 
             // Retrieve any existing values for the fields in the selected data collection.
             var currentFieldData = await _api.GetDataCollectionRecordValuesAsync(new List<int>() { ViewModel.ModifyMatterDataFieldsViewModel.MatterId }, ViewModel.ModifyMatterDataFieldsViewModel.MatterTypeId);
-            if (currentFieldData.DataCollectionRecordValues.Any())
+            foreach (var fieldValue in currentFieldData.DataCollectionRecordValues.Where(x => x.Links.MatterId == ViewModel.ModifyMatterDataFieldsViewModel.MatterId))
             {
-                foreach (var fieldValue in currentFieldData.DataCollectionRecordValues)
+                if (ViewModel.ModifyMatterDataFieldsViewModel.DataFields.ContainsKey(fieldValue.Links.DataCollectionFieldId))
                 {
-                    if (ViewModel.ModifyMatterDataFieldsViewModel.DataFields.ContainsKey(fieldValue.Links.DataCollectionFieldId))
-                    {
-                        ViewModel.ModifyMatterDataFieldsViewModel.DataFields[fieldValue.Links.DataCollectionFieldId].Value = fieldValue.Value;
-                        ViewModel.ModifyMatterDataFieldsViewModel.DataFields[fieldValue.Links.DataCollectionFieldId].DataCollectionRecordValueId = fieldValue.DataCollectionRecordValueId;
-                    }
+                    ViewModel.ModifyMatterDataFieldsViewModel.DataFields[fieldValue.Links.DataCollectionFieldId].Value = fieldValue.Value;
+                    ViewModel.ModifyMatterDataFieldsViewModel.DataFields[fieldValue.Links.DataCollectionFieldId].DataCollectionRecordValueId = fieldValue.DataCollectionRecordValueId;
                 }
             }
         }

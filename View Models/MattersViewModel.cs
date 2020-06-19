@@ -38,6 +38,7 @@ namespace Actionstep.API.WebClient.View_Models
 
         public class ModifyDataFieldsViewModel
         {
+            public int SelectedDataCollection { get; set; } = -1;
             public int MatterId { get; set; }
             public int MatterTypeId { get; set; }
             public Dictionary<string, DataFieldViewModel> DataFields { get; set; } = new Dictionary<string, DataFieldViewModel>();
