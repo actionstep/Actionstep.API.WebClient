@@ -137,8 +137,8 @@ namespace Actionstep.API.WebClient.Pages
 
         public async Task DeleteResthooks()
         {
-            // more to add here......
-
+            var resthooksToDelete = ViewModel.ResthookPagedData.DataCollection.Where(x => x.Selected).Select(x => x.ResthookId);
+            await _api.DeleteMultipleResthooksAsync(resthooksToDelete);
 
             ViewModel.EnableMultipleDelete = false;
 

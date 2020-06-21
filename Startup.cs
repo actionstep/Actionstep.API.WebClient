@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Actionstep.API.WebClient
 {
-    // Ngrok: from the cmd prompt => ngrok http 50241 -host-header="localhost:50241"
+    // Ngrok: from the cmd prompt => ngrok http 50241 -host-header="localhost:50241" -region au
 
     public class Startup
     {

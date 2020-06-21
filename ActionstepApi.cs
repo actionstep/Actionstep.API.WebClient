@@ -1058,6 +1058,19 @@ namespace Actionstep.API.WebClient
 
             return response.IsSuccessStatusCode;
         }
+
+
+        public async Task<bool> DeleteMultipleResthooksAsync(IEnumerable<int> resthooksToDelete)
+        {
+            var response = await _policy.ExecuteAsync(async context =>
+            {
+                var message = new HttpRequestMessage(HttpMethod.Delete, $"/api/rest/resthooks/{string.Join(",", resthooksToDelete)}");
+                message = SetMessageDefaultHeaders(message);
+                return await _httpClient.SendAsync(message);
+            }, ContextData);
+
+            return response.IsSuccessStatusCode;
+        }
         #endregion
 
         #region Current User.
