@@ -44,7 +44,7 @@ The source code includes a number of third-party open source components from Git
 In order to demonstrate the use of OAuth and REST (web) hooks from your local development environment we recommend using [Ngrok](https://ngrok.com/) to proxy 
 incoming responses back to your localhost environment.  
 
-###### MIT License
+## MIT License
 
 Copyright 2020 Actionstep Limited
 
