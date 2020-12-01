@@ -769,11 +769,11 @@ namespace Actionstep.API.WebClient
         }
 
 
-        public async Task<bool> CreateDocumentAsync(string name, string uploadedFileId, int parentMatterId)
+        public async Task<bool> CreateDocumentAsync(string name, string uploadedFileId, string filename, int parentMatterId)
         {
             var dto = new CreateDocumentRequestDto();
             dto.Documents.Name = name;
-            dto.Documents.FileId = uploadedFileId;
+            dto.Documents.FileId = $"{uploadedFileId};{filename}";
 
             dto.Documents.DocumentLinks = new CreateDocumentRequestDto.Document.Links()
             { 

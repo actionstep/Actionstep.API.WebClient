@@ -153,7 +153,8 @@ namespace Actionstep.API.WebClient.Pages
                     var fileIdentifier = await _api.UploadFileAsync(ViewModel.AddEditViewModel.UploadFile);
                     if (!String.IsNullOrEmpty(fileIdentifier))
                     {
-                        success = await _api.CreateDocumentAsync(ViewModel.AddEditViewModel.Name, fileIdentifier, Convert.ToInt32(ViewModel.AddEditViewModel.ActionId));
+                        success = await _api.CreateDocumentAsync(ViewModel.AddEditViewModel.Name, fileIdentifier, ViewModel.AddEditViewModel.UploadFile.Name, 
+                                                                 Convert.ToInt32(ViewModel.AddEditViewModel.ActionId));
                     }
                 }
                 else
