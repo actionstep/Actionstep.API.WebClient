@@ -78,14 +78,14 @@
                                             <div class="form-group">
                                                 @if (ViewModel.Debounce)
                                                 {
-                                                    <button type="submit" class="btn btn-primary btn-sm" disabled>
+                                                    <button type="submit" class="btn btn-primary btn-sm mr-1" disabled>
                                                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                                         Saving...
                                                     </button>
                                                 }
                                                 else
                                                 {
-                                                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                                    <button type="submit" class="btn btn-primary btn-sm mr-1">Save</button>
                                                 }
                                                 <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => CancelNewResthook())">Cancel</button>
                                             </div>

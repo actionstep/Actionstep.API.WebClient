@@ -29,7 +29,9 @@ namespace Actionstep.API.WebClient.Validators
         private static void ValidateModel(EditContext editContext, ValidationMessageStore messages)
         {
             var validator = GetValidatorForModel(editContext.Model);
-            var validationResults = validator.Validate(editContext.Model);
+
+            var context = new ValidationContext<object>(editContext.Model);
+            var validationResults = validator.Validate(context);
 
             messages.Clear();
             foreach (var validationResult in validationResults.Errors)
@@ -44,7 +46,7 @@ namespace Actionstep.API.WebClient.Validators
         private static void ValidateField(EditContext editContext, ValidationMessageStore messages, in FieldIdentifier fieldIdentifier)
         {
             var properties = new[] { fieldIdentifier.FieldName };
-            var context = new ValidationContext(fieldIdentifier.Model, new PropertyChain(), new MemberNameValidatorSelector(properties));
+            var context = new ValidationContext<object>(fieldIdentifier.Model, new PropertyChain(), new MemberNameValidatorSelector(properties));
 
             var validator = GetValidatorForModel(fieldIdentifier.Model);
             var validationResults = validator.Validate(context);

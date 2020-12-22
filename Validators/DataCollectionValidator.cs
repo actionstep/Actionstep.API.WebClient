@@ -7,7 +7,7 @@ namespace Actionstep.API.WebClient.Validators
     {
         public DataCollectionValidator()
         {
-            CascadeMode = CascadeMode.StopOnFirstFailure;
+            CascadeMode = CascadeMode.Stop;
 
             RuleFor(p => p.MatterTypeId).NotNull().WithMessage("You must associate this data collection with a matter type.");
             When(p => p.MatterTypeId != null, () =>

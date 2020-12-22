@@ -7,7 +7,7 @@ namespace Actionstep.API.WebClient.Validators
     {
         public ResthookValidator()
         {
-            CascadeMode = CascadeMode.StopOnFirstFailure;
+            CascadeMode = CascadeMode.Stop;
 
             RuleFor(p => p.EventName).NotNull().WithMessage("You must select an event for this REST hook.");
             RuleFor(p => p.TargetUrl).NotEmpty().WithMessage("You must specify a target url for this REST hook.");

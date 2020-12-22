@@ -7,7 +7,7 @@ namespace Actionstep.API.WebClient.Validators
     {
         public FilenoteValidator()
         {
-            CascadeMode = CascadeMode.StopOnFirstFailure;
+            CascadeMode = CascadeMode.Stop;
 
             RuleFor(p => p.ActionId).NotNull().WithMessage("You must select a Matter to associate with this file note.");
             When(p => p.ActionId != null, () =>

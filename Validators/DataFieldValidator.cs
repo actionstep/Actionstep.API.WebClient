@@ -7,7 +7,7 @@ namespace Actionstep.API.WebClient.Validators
     {
         public DataFieldValidator()
         {
-            CascadeMode = CascadeMode.StopOnFirstFailure;
+            CascadeMode = CascadeMode.Stop;
 
             RuleFor(p => p.DataCollectionId).NotNull().WithMessage("You must associate this data field with a data collection.");
             When(p => p.DataCollectionId != null, () =>

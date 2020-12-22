@@ -7,7 +7,7 @@ namespace Actionstep.API.WebClient.Validators
     {
         public SettingsValidator()
         {
-            CascadeMode = CascadeMode.StopOnFirstFailure;
+            CascadeMode = CascadeMode.Stop;
 
             RuleFor(p => p.ClientId).NotEmpty().WithMessage("You must supply your Client ID.");
             RuleFor(p => p.ClientSecret).NotEmpty().WithMessage("You must supply your Client Secret.");

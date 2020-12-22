@@ -3,7 +3,6 @@
 @using Actionstep.API.WebClient.Paging;
 @using Actionstep.API.WebClient.UI_Components;
 @using Actionstep.API.WebClient.Validators;
-@using BlazorInputFile; 
 
     <div class="container-fluid">
         <div class="row pt-md-5 pb-md-5">
@@ -78,7 +77,7 @@
                                             {
                                             <div class="form-group">
                                                 <div class="custom-file">
-                                                    <InputFile class="form-control form-control-sm custom-file-input" id="docToUpload" OnChange="OnFileSelectionChanged" />
+                                                    <BlazorInputFile.InputFile class="form-control form-control-sm custom-file-input" id="docToUpload" OnChange="OnFileSelectionChanged" />
                                                     <label class="form-control form-control-sm custom-file-label" for="docToUpload">
                                                         @if (ViewModel.AddEditViewModel.UploadFile != null)
                                                         {
@@ -86,7 +85,7 @@
                                                         }
                                                         else
                                                         {
-                                                            <span>Choose file to upload...</span>
+                                                            <span>Choose a file to upload...</span>
                                                         }
                                                     </label>
                                                     <small class="form-text text-muted">
@@ -101,14 +100,14 @@
                                                 <div class="form-group">
                                                     @if (ViewModel.Debounce)
                                                     {
-                                                        <button type="submit" class="btn btn-primary btn-sm" disabled>
+                                                        <button type="submit" class="btn btn-primary btn-sm mr-1" disabled>
                                                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                                             Saving...
                                                         </button>
                                                     }
                                                     else
                                                     {
-                                                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                                        <button type="submit" class="btn btn-primary btn-sm mr-1">Save</button>
                                                     }
                                                     <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => CancelNewDocument())">Cancel</button>
                                                 </div>
@@ -194,7 +193,7 @@
                                                 <div class="float-right">
                                                     @if (ViewModel.IsDownloading && ViewModel.DownloadingDocumentId == document.DocumentId)
                                                     {
-                                                        <button type="button" class="ml-3 form-control-sm btn btn-info btn-sm" disabled
+                                                        <button type="button" class="ml-3 form-control-sm btn btn-info btn-sm mr-1" disabled
                                                                 @onclick="@(() => DownloadDocument(document.DocumentId))">
                                                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                                             Downloading...
@@ -202,7 +201,7 @@
                                                     }
                                                     else
                                                     {
-                                                        <button type="button" class="ml-3 form-control-sm btn btn-info btn-sm" @onclick="@(() => DownloadDocument(document.DocumentId))">Download</button>
+                                                        <button type="button" class="ml-3 form-control-sm btn btn-info btn-sm mr-1" @onclick="@(() => DownloadDocument(document.DocumentId))">Download</button>
                                                     }
                                                     <button type="button" class="form-control-sm btn btn-primary btn-sm" @onclick="@(() => EditDocument(document.DocumentId))">Edit</button>
                                                     <button type="button" class="form-control-sm btn btn-danger btn-sm" @onclick="@(() => DeleteDocument(document.DocumentId))">Delete</button>

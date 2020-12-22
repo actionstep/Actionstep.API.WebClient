@@ -20,6 +20,7 @@ namespace Actionstep.API.WebClient
     public class ActionstepApi
     {
         private const int MAX_PAGE_SIZE = 50;
+        private const int MAX_CHUNK_SIZE = 5 * 1024 * 1024; // 5MB max chunk size.
 
         private readonly HttpClient _httpClient;
         private readonly AppConfiguration _appConfiguration;
@@ -856,19 +857,19 @@ namespace Actionstep.API.WebClient
             string fileIdentifier = null;
             string boundary = Guid.NewGuid().ToString();
 
-            int chunkSize = 5242880; // 5MB max chunk size.
-            int totalChunks = (int)(fileToUpload.Size / chunkSize);
-            if (fileToUpload.Size % chunkSize != 0)
+            int totalChunks = (int)(fileToUpload.Size / MAX_CHUNK_SIZE);
+            if (fileToUpload.Size % MAX_CHUNK_SIZE != 0)
             {
                 totalChunks++;
             }
 
             for (int i = 0; i < totalChunks; i++)
             {
-                long position = (i * (long)chunkSize);
-                int toRead = (int)Math.Min(fileToUpload.Size - position + 1, chunkSize);
+                long position = (i * (long)MAX_CHUNK_SIZE);
+                //int toRead = (int)Math.Min(fileToUpload.Size - position + 1, chunkSize);
+                int toRead = (int)Math.Min(fileToUpload.Size - position, MAX_CHUNK_SIZE);
                 byte[] buffer = new byte[toRead];
-                await fileToUpload.Data.ReadAsync(buffer, 0, buffer.Length);
+                await fileToUpload.Data.ReadAsync(buffer.AsMemory(0, buffer.Length));
 
                 var content = new MultipartFormDataContent();
                 content.Add(new ByteArrayContent(buffer), "file", fileToUpload.Name);
@@ -903,9 +904,8 @@ namespace Actionstep.API.WebClient
 
         public async Task<byte[]> DownloadFileAsync(string internalfileIdentifier, int fileSize)
         {
-            int chunkSize = 5242880; // 5MB max chunk size.
-            int totalChunks = (int)(fileSize / chunkSize);
-            if (fileSize % chunkSize != 0)
+            int totalChunks = (int)(fileSize / MAX_CHUNK_SIZE);
+            if (fileSize % MAX_CHUNK_SIZE != 0)
             {
                 totalChunks++;
             }

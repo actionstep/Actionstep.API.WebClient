@@ -36,7 +36,7 @@ The REST hooks page demonstrates how to register a web hook for an Actionstep ev
 ### Technology Stack
 
 The application is built using Microsoft .NET Core and Blazor (the new Web Assembly technology for building web applications in native languages).
-To build and run the application you will need to install [Microsoft Visual Studio (Community Preview Edition)](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=community&ch=pre&rel=16) which is free to download and install.
+To build and run the application you will need to install [Microsoft Visual Studio (Community Edition)](https://visualstudio.microsoft.com/downloads/) which is free to download and install.
 The source code includes a number of third-party open source components from Github, for example, Newtonsoft Json, and the Polly retry library.
 
 #### Ngrok
