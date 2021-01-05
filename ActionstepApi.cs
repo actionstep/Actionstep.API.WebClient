@@ -775,7 +775,6 @@ namespace Actionstep.API.WebClient
             var dto = new CreateDocumentRequestDto();
             dto.Documents.Name = name;
             dto.Documents.FileId = $"{uploadedFileId};{filename}";
-
             dto.Documents.DocumentLinks = new CreateDocumentRequestDto.Document.Links()
             { 
                 MatterId = parentMatterId
@@ -854,7 +853,7 @@ namespace Actionstep.API.WebClient
         #region Upload and Download files
         public async Task<string> UploadFileAsync(IFileListEntry fileToUpload)
         {
-            string fileIdentifier = null;
+            string fileIdentifier = string.Empty;
             string boundary = Guid.NewGuid().ToString();
 
             int totalChunks = (int)(fileToUpload.Size / MAX_CHUNK_SIZE);
@@ -863,21 +862,28 @@ namespace Actionstep.API.WebClient
                 totalChunks++;
             }
 
+            using var ms = new MemoryStream();
+            await fileToUpload.Data.CopyToAsync(ms);
+
             for (int i = 0; i < totalChunks; i++)
             {
                 long position = (i * (long)MAX_CHUNK_SIZE);
-                //int toRead = (int)Math.Min(fileToUpload.Size - position + 1, chunkSize);
                 int toRead = (int)Math.Min(fileToUpload.Size - position, MAX_CHUNK_SIZE);
                 byte[] buffer = new byte[toRead];
-                await fileToUpload.Data.ReadAsync(buffer.AsMemory(0, buffer.Length));
 
-                var content = new MultipartFormDataContent();
-                content.Add(new ByteArrayContent(buffer), "file", fileToUpload.Name);
+                ms.Position = position;
+                var bytesRead = await ms.ReadAsync(buffer.AsMemory(0, toRead));
+
+                var content = new MultipartFormDataContent
+                {
+                    { new ByteArrayContent(buffer), "file", fileToUpload.Name }
+                };
                 content.Headers.ContentType.MediaType = "multipart/form-data";
 
                 var response = await _policy.ExecuteAsync(async context =>
                 {
-                    var message = new HttpRequestMessage(HttpMethod.Post, $"/api/rest/files?part_number={i + 1}&part_count={totalChunks}")
+                    var urlFragment = i >= 1 ? $"/{fileIdentifier}" : "";
+                    var message = new HttpRequestMessage(HttpMethod.Post, $"/api/rest/files{urlFragment}?part_number={i + 1}&part_count={totalChunks}")
                     {
                         Content = content
                     };
@@ -893,8 +899,7 @@ namespace Actionstep.API.WebClient
                     {
                         var data = JObject.Parse(responseContent);
                         var fileDto = data["files"].ToObject<FileResponseDto>();
-                        if (fileDto.Status.ToLower() == "uploaded")
-                            fileIdentifier = fileDto.Id;
+                        fileIdentifier = fileDto.Id;
                     }
                 }
             }
