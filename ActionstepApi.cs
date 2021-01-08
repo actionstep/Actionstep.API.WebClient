@@ -486,7 +486,7 @@ namespace Actionstep.API.WebClient
         }
 
 
-        public async Task<bool> UpdateDataFieldValue(string dataCollectionRecordValueId, string dataFieldValue)
+        public async Task<bool> UpdateDataFieldValueAsync(string dataCollectionRecordValueId, string dataFieldValue)
         {
             var dto = new UpdateDataFieldValueRequestDto();
             dto.DataFields.DataValue = dataFieldValue;
@@ -507,6 +507,56 @@ namespace Actionstep.API.WebClient
             }, ContextData);
 
             return response.IsSuccessStatusCode;
+        }
+
+
+        public async Task<bool> DataCollectionRecordExistsAsync(int dataCollectionId, int matterId)
+        {
+            var response = await _policy.ExecuteAsync(async context =>
+            {
+                var message = new HttpRequestMessage(HttpMethod.Get, $"/api/rest/datacollectionrecords?dataCollection={dataCollectionId}&action={matterId}");
+                message = SetMessageDefaultHeaders(message);
+                return await _httpClient.SendAsync(message);
+            }, ContextData);
+
+            return response.StatusCode == HttpStatusCode.NoContent;
+        }
+
+
+        public async Task<int> CreateDataCollectionRecordAsync(int dataCollectionId, int matterId)
+        {
+            var dto = new CreateDataCollectionRecordRequestDto();
+            dto.DataCollectionRecords.DataCollectionRecordLinks = new CreateDataCollectionRecordRequestDto.Links()
+            {
+                MatterId = matterId,
+                DataCollectionId = dataCollectionId
+            };
+
+            var jsonDto = JsonConvert.SerializeObject(dto);
+            var content = new StringContent(jsonDto);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.api+json");
+
+            var response = await _policy.ExecuteAsync(async context =>
+            {
+                var message = new HttpRequestMessage(HttpMethod.Post, $"/api/rest/datacollectionrecords")
+                {
+                    Content = content
+                };
+
+                message = SetMessageDefaultHeaders(message);
+                return await _httpClient.SendAsync(message);
+            }, ContextData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                if (!String.IsNullOrEmpty(responseContent))
+                {
+                    var data = JObject.Parse(responseContent);
+                    return data["datacollectionrecords"].ToObject<DataCollectionRecordsResponseDto>().DataCollectionRecordId;
+                }
+            }
+            return -1;
         }
         #endregion
 

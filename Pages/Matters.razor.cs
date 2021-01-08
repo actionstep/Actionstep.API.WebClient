@@ -125,6 +125,8 @@ namespace Actionstep.API.WebClient.Pages
 
         public void EditCustomData(int matterId, int matterTypeId)
         {
+            ViewModel.SelectedMatter = matterId;
+
             ViewModel.ModifyMatterDataFieldsViewModel = new MattersViewModel.ModifyDataFieldsViewModel
             {
                 MatterId = matterId,
@@ -138,6 +140,8 @@ namespace Actionstep.API.WebClient.Pages
 
         public async Task OnEditMatterDataSelectedDataCollectionChanged(int dataCollectionId)
         {
+            ViewModel.SelectedDataCollection = dataCollectionId;
+
             ViewModel.ModifyMatterDataFieldsViewModel.DataFields.Clear();
 
             var dataFields = await _api.GetDataCollectionFieldsAsync(dataCollectionId);
@@ -171,7 +175,14 @@ namespace Actionstep.API.WebClient.Pages
         {
             foreach (var dataField in ViewModel.ModifyMatterDataFieldsViewModel.DataFields)
             {
-                await _api.UpdateDataFieldValue(dataField.Value.DataCollectionRecordValueId, dataField.Value.Value);
+                var dataCollectionRecordValueId = dataField.Value.DataCollectionRecordValueId;
+                if (dataCollectionRecordValueId == null)
+                {
+                    var dataCollectionRecordId = await _api.CreateDataCollectionRecordAsync(ViewModel.SelectedDataCollection, ViewModel.SelectedMatter);
+                    dataCollectionRecordValueId = $"{dataField.Key}--{dataCollectionRecordId}";
+                }
+
+                await _api.UpdateDataFieldValueAsync(dataCollectionRecordValueId, dataField.Value.Value);
             }
 
             ViewModel.ModifyMatterDataFieldsViewModel.DataFields.Clear();

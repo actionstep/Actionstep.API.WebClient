@@ -21,6 +21,7 @@ namespace Actionstep.API.WebClient.View_Models
         public int FilterByMatterType { get; set; } = -1;
         public int FilterByDataCollection { get; set; } = -1;
         public int SelectedDataCollection { get; set; } = -1;
+        public int SelectedMatter { get; set; }
 
         public bool Loading { get; set; } = true;
         public bool ShowCustomDataCard { get; set; } = false;

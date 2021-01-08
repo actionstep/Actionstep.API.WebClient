@@ -280,7 +280,8 @@ namespace Actionstep.API.WebClient.Pages
             {
                 new DataTypeLookup() { InternalIdentifier = "Str255", DisplayName = "String" },
                 new DataTypeLookup() { InternalIdentifier = "DateNM", DisplayName = "Date" },
-                new DataTypeLookup() { InternalIdentifier = "Money", DisplayName = "Money" }
+                new DataTypeLookup() { InternalIdentifier = "Money", DisplayName = "Money" },
+                new DataTypeLookup() { InternalIdentifier = "Number", DisplayName = "Number" }
             };
         }
 
