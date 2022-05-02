@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Actionstep.API.WebClient.Pages
 {
-    public partial class Filenotes
+    public partial class Filenotes : IDisposable
     {
         [Inject] private AppState _appState { get; set; }
         [Inject] private ActionstepApi _api { get; set; }
@@ -211,6 +211,11 @@ namespace Actionstep.API.WebClient.Pages
             };
 
             return toastContent;
+        }
+        
+        public void Dispose()
+        {
+            _appState.OnFilenoteResthookReceived -= OnFilenoteResthookReceived;
         }
     }
 }
