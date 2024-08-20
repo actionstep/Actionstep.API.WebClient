@@ -57,7 +57,7 @@ namespace Actionstep.API.WebClient.Shared
             _appState.AccessToken = accessTokenDto.access_token;
             _appState.TokenType = accessTokenDto.token_type;
             _appState.ExpiresIn = accessTokenDto.expires_in;
-            _appState.ApiEndpoint = accessTokenDto.api_endpoint;
+            _appState.ApiEndpoint = "https://clinton--ap-southeast-2.actionstepdev.com/";
             _appState.Orgkey = accessTokenDto.orgkey;
             _appState.RefreshToken = accessTokenDto.refresh_token;
         }
