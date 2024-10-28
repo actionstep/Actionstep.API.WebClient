@@ -930,10 +930,14 @@ namespace Actionstep.API.WebClient
                 };
                 content.Headers.ContentType.MediaType = "multipart/form-data";
 
+            var emailId = "1";
+            var filename = fileToUpload.Name;
+
                 var response = await _policy.ExecuteAsync(async context =>
                 {
                     var urlFragment = i >= 1 ? $"/{fileIdentifier}" : "";
-                    var message = new HttpRequestMessage(HttpMethod.Post, $"/api/rest/files{urlFragment}?part_number={i + 1}&part_count={totalChunks}")
+                   var message1 = new HttpRequestMessage(HttpMethod.Post, $"/api/rest/files{urlFragment}?part_number={i + 1}&part_count={totalChunks}");
+                   var message = new HttpRequestMessage(HttpMethod.Post, $"/api/v2/email-message/{emailId}/add-attachment-from-file/{filename}")
                     {
                         Content = content
                     };
